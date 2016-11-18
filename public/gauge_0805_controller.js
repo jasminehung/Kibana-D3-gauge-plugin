@@ -22,19 +22,19 @@ define(function (require) {
   var tickData = undefined;
   var pointer = undefined;
 
-  var _buildVis = function (root) {
+  var _buildVis = function (root, name) {
         var gauge = function() {
       	var that = {};
       	var config = {
-      		size						: 300,
-      		pointerWidth				: 10,
-      		pointerTailLength			: 5,
-      		pointerHeadLengthPercent	: 0.9,
-      		transitionMs				: 4000,
-      		majorTicks					: 5,
-      		labelFormat					: d3.format(',g'),
-      		labelInset					: 10,
-          arcColorFn					: d3.interpolateHsl(d3.rgb($scope.vis.params.colorleft), d3.rgb($scope.vis.params.colorright))
+      		size: 300,
+      		pointerWidth: 10,
+      		pointerTailLength: 5,
+      		pointerHeadLengthPercent: 0.9,
+      		transitionMs: 4000,
+      		majorTicks: 5,
+      		labelFormat: d3.format(',g'),
+      		labelInset: 10,
+          arcColorFn: d3.interpolateHsl(d3.rgb($scope.vis.params.colorleft), d3.rgb($scope.vis.params.colorright))
       	};
 
       	function deg2rad(deg) {
@@ -73,13 +73,14 @@ define(function (require) {
       	}
 
       	function render(newValue) {
-      		svg = d3.select('#power-gauge')
-      			.append('svg:svg')
+          var container = div.append('div')
+                         .attr('class', 'gauge_container');
+          container.append('h3').text(name);
+      		svg = container.append('svg:svg')
       				.attr('class', 'gauge')
       				.attr('width', 300)
       				.attr('height', 250);
-
-      		var centerTx = centerTranslation();
+          var centerTx = centerTranslation();
 
       		var arcs = svg.append('g')
       				.attr('class', 'arc')
@@ -156,32 +157,29 @@ define(function (require) {
     };
 
 
-    var _render = function (data) {
-    	d3.select(svgRoot).selectAll('svg').remove();
-      _buildVis(data);
+    var _render = function (data, name) {
+      _buildVis(data, name);
     };
 
 
     $scope.$watch('esResponse', function(resp) {
+      d3.select(svgRoot).selectAll('svg').remove();
   		if (!resp) {
   			$scope.tags = null;
   			return;
   		}
 
   		var tagsAggId = $scope.vis.aggs.bySchemaName['segment'][0].id;    // = 2 or 3 ....
-      console.log("tagsAggId="+tagsAggId);
 
   		var metricsAgg = $scope.vis.aggs.bySchemaName['metric'][0]; //分子Dividend
       var metricsAgg2 = $scope.vis.aggs.bySchemaName['metric2'][0]; //分母Divisor
   		var buckets = resp.aggregations[tagsAggId].buckets;  //an object
-      console.log("buckets");console.log(buckets);
 
 
       buckets.map(function(bucket) {
-      var value = metricsAgg.getValue(bucket)*100/metricsAgg2.getValue(bucket);
-      console.log("分子Dividend="+ metricsAgg.getValue(bucket));
-      console.log("分母Divisor=" +metricsAgg2.getValue(bucket));
-      _render(value);
+        console.log(bucket);
+        var value = metricsAgg.getValue(bucket)*100/metricsAgg2.getValue(bucket);
+        _render(value, bucket.key);
       });
   	});
   });
