@@ -9,7 +9,7 @@ Options
 
 ![alt tag](https://github.com/jasminehung/Kibana-d3-gauge-plugin/blob/master/kibana-d3-gauge2.PNG)
 
-###Data
+### Data
  * Choose the dividend and divisor in the metrics field, you need ONE metric for each.
  * Bucket field could not be blank. ([issue 1](https://github.com/jasminehung/Kibana-d3-gauge-plugin/issues))
 
